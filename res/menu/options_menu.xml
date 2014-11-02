@@ -128,8 +128,11 @@
             <item
                 android:id="@+id/menu_info_about"
                 android:title="@string/menu_info_about"/>
+            <item
+                android:id="@+id/menu_info_about2"
+                android:title="@string/menu_info_about2"/>
         </menu>
     </item>
 
-</menu><!-- Copyright 2014 (c) YA <ya.androidapp@gmail.com> All rights reserved. -->
+</menu> <!-- Copyright 2014 (c) YA <ya.androidapp@gmail.com> All rights reserved. -->
 <!-- This software includes the work that is distributed in the GNU Lesser GPL -->

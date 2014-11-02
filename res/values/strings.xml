@@ -15,6 +15,7 @@
 
     <string name="application_name">AdvancedMapViewer2</string>
     <string name="cancel">Cancel</string>
+    <string name="copyright">Copyright 2014 &#169; YA &lt;ya.androidapp@gmail.com&gt; All rights reserved. \n See: https://github.com/YA-androidapp/AdvancedMapViewer2</string>
     <string name="error">Error</string>
     <string name="error_last_location_unknown">The last location is unknown</string>
     <string name="file_invalid">The selected file is invalid.</string>
@@ -43,7 +44,8 @@
     <string name="longitude">Longitude</string>
     <string name="menu_info">Info</string>
     <string name="menu_info_map_file">Map file properties</string>
-    <string name="menu_info_about">About this software</string>
+    <string name="menu_info_about">About mapsforge</string>
+    <string name="menu_info_about2">About this software</string>
     <string name="menu_mapfile">Map file</string>
     <string name="menu_mapfile_offline">Local</string>
     <string name="menu_mapfile_online">Download</string>

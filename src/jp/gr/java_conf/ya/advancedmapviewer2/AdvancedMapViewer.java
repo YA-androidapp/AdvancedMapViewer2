@@ -79,7 +79,6 @@ import android.os.Bundle;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -125,6 +124,7 @@ public class AdvancedMapViewer extends MapActivity {
 	private static final int DIALOG_ENTER_COORDINATES = 0;
 	private static final int DIALOG_INFO_MAP_FILE = 1;
 	private static final int DIALOG_LOCATION_PROVIDER_DISABLED = 2;
+	private static final int DIALOG_INFO_ABOUT2 = 3;
 	private static final FileFilter FILE_FILTER_EXTENSION_MAP = new FilterByFileExtension(".map");
 	private static final FileFilter FILE_FILTER_EXTENSION_XML = new FilterByFileExtension(".xml");
 	private static final int SELECT_MAP_FILE = 0;
@@ -225,6 +225,10 @@ public class AdvancedMapViewer extends MapActivity {
 				startActivity(new Intent(this, InfoView.class));
 				return true;
 
+			case R.id.menu_info_about2:
+				showDialog(DIALOG_INFO_ABOUT2);
+				return true;
+
 			case R.id.menu_position:
 				return true;
 
@@ -265,7 +269,7 @@ public class AdvancedMapViewer extends MapActivity {
 
 			case R.id.menu_position_bookmark_remove:
 				if (bma.length > 0) {
-					new AlertDialog.Builder(this).setTitle(R.string.menu_position_bookmark_save)
+					new AlertDialog.Builder(this).setTitle(R.string.menu_position_bookmark_remove)
 							.setItems(bma, new DialogInterface.OnClickListener() {
 								@Override
 								public void onClick(DialogInterface dialog, int which) {
@@ -484,13 +488,11 @@ public class AdvancedMapViewer extends MapActivity {
 				String source = download("http://www.geocoding.jp/api/?v=1.1&q=" + encodedPlacename);
 				if (source != null) {
 					if (source.equals("") == false) {
-						Log.v("", source);
 						try {
 							String regex = "<lat>(-?[.0-9]+)<[^<]*?<lng>(-?[.0-9]+)<";
 							Pattern pattern = Pattern.compile(regex);
 							final Matcher matcher = pattern.matcher(source);
 							if (matcher.find()) {
-								Log.v("", matcher.group());
 								runOnUiThread(new Runnable() {
 									@Override
 									public void run() {
@@ -501,15 +503,13 @@ public class AdvancedMapViewer extends MapActivity {
 								});
 							}
 						} catch (Exception e) {
-							Toast.makeText(AdvancedMapViewer.this, getString(R.string.not_found), Toast.LENGTH_SHORT)
-									.show();
+							showToastOnUiThread(getString(R.string.not_found));
 						}
 					} else {
-						Toast.makeText(AdvancedMapViewer.this, getString(R.string.not_found), Toast.LENGTH_SHORT)
-								.show();
+						showToastOnUiThread(getString(R.string.not_found));
 					}
 				} else {
-					Toast.makeText(AdvancedMapViewer.this, getString(R.string.not_found), Toast.LENGTH_SHORT).show();
+					showToastOnUiThread(getString(R.string.not_found));
 				}
 			}
 		}).start();
@@ -525,28 +525,28 @@ public class AdvancedMapViewer extends MapActivity {
 		HttpParams httpParams = httpClient.getParams();
 		HttpConnectionParams.setConnectionTimeout(httpParams, 1000);
 		HttpConnectionParams.setSoTimeout(httpParams, 1000);
-
-		String result = "";
+		HttpGet httpGet = new HttpGet(urlStr);
+		StringBuilder stringBuilder = new StringBuilder();
 
 		try {
-			HttpGet httpGet = new HttpGet(urlStr);
 			HttpResponse httpResponse = httpClient.execute(httpGet);
 			if (httpResponse.getStatusLine().getStatusCode() < 400) {
 				InputStream inputStream = httpResponse.getEntity().getContent();
 				InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
 				BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-				StringBuilder stringBuilder = new StringBuilder();
 				String bufferedReaderReadLine;
 				while ((bufferedReaderReadLine = bufferedReader.readLine()) != null) {
 					stringBuilder.append(bufferedReaderReadLine);
 				}
-				result = stringBuilder.toString();
 				inputStream.close();
+				return stringBuilder.toString();
 			}
 		} catch (IOException e) {
-			return null;
+			return "";
+		} catch (Exception e) {
+			return "";
 		}
-		return result;
+		return "";
 	}
 
 	/**
@@ -792,6 +792,12 @@ public class AdvancedMapViewer extends MapActivity {
 			builder.setView(factory.inflate(R.layout.dialog_info_map_file, null));
 			builder.setPositiveButton(R.string.ok, null);
 			return builder.create();
+		} else if (id == DIALOG_INFO_ABOUT2) {
+			builder.setIcon(android.R.drawable.ic_menu_info_details);
+			builder.setTitle(R.string.menu_info_about2);
+			builder.setMessage(R.string.copyright);
+			builder.setPositiveButton(R.string.ok, null);
+			return builder.create();
 		} else {
 			// do dialog will be created
 			return null;
@@ -1016,14 +1022,12 @@ public class AdvancedMapViewer extends MapActivity {
 	 */
 	void showToastOnUiThread(final String text) {
 		if (AndroidUtils.currentThreadIsUiThread()) {
-			Toast toast = Toast.makeText(this, text, Toast.LENGTH_LONG);
-			toast.show();
+			Toast.makeText(this, text, Toast.LENGTH_LONG).show();
 		} else {
 			runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					Toast toast = Toast.makeText(AdvancedMapViewer.this, text, Toast.LENGTH_LONG);
-					toast.show();
+					Toast.makeText(AdvancedMapViewer.this, text, Toast.LENGTH_LONG).show();
 				}
 			});
 		}
