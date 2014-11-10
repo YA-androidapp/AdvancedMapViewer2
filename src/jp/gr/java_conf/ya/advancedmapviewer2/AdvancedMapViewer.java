@@ -130,6 +130,8 @@ public class AdvancedMapViewer extends MapActivity {
 	private static final int SELECT_MAP_FILE = 0;
 	private static final int SELECT_RENDER_THEME_FILE = 1;
 
+	private boolean enabledSetResult = false;
+
 	private MyLocationOverlay myLocationOverlay;
 	private ScreenshotCapturer screenshotCapturer;
 	private ToggleButton snapToLocationView;
@@ -205,16 +207,23 @@ public class AdvancedMapViewer extends MapActivity {
 				MapViewPosition mapViewPosition3 = this.mapView.getMapViewPosition();
 				GeoPoint mapCenter3 = mapViewPosition3.getCenter();
 				Intent intent3 = new Intent();
-				Bundle bundle = new Bundle();
-				bundle.putString("latitude", Double.toString(mapCenter3.latitude));
-				bundle.putString("longitude", Double.toString(mapCenter3.longitude));
-				bundle.putString("zoom", String.valueOf(mapViewPosition3.getZoomLevel()));
-				intent3.putExtras(bundle);
-				intent3.setData(Uri.parse("geo:" + Double.toString(mapCenter3.latitude) + ","
-						+ Double.toString(mapCenter3.longitude) + "?z="
-						+ String.valueOf(mapViewPosition3.getZoomLevel())));
-				setResult(RESULT_OK, intent3);
-				finish();
+				if (this.enabledSetResult) {
+					Bundle bundle = new Bundle();
+					bundle.putString("latitude", Double.toString(mapCenter3.latitude));
+					bundle.putString("longitude", Double.toString(mapCenter3.longitude));
+					bundle.putString("zoom", String.valueOf(mapViewPosition3.getZoomLevel()));
+					intent3.putExtras(bundle);
+					intent3.setData(Uri.parse("geo:" + Double.toString(mapCenter3.latitude) + ","
+							+ Double.toString(mapCenter3.longitude) + "?z="
+							+ String.valueOf(mapViewPosition3.getZoomLevel())));
+					setResult(RESULT_OK, intent3);
+					finish();
+				} else {
+					intent3 = new Intent(Intent.ACTION_VIEW, Uri.parse("geo:" + Double.toString(mapCenter3.latitude)
+							+ "," + Double.toString(mapCenter3.longitude) + "?z="
+							+ String.valueOf(mapViewPosition3.getZoomLevel())));
+					startActivity(intent3);
+				}
 				return true;
 
 			case R.id.menu_info_map_file:
@@ -582,6 +591,14 @@ public class AdvancedMapViewer extends MapActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Intent intent = getIntent();
+		if (intent != null) {
+			if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+				// if the calling activity is expecting a result
+				this.enabledSetResult = true;
+			}
+		}
 
 		this.screenshotCapturer = new ScreenshotCapturer(this);
 		this.screenshotCapturer.start();

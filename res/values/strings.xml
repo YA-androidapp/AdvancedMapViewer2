@@ -68,7 +68,7 @@
     <string name="menu_screenshot">Screenshot</string>
     <string name="menu_screenshot_jpeg">JPEG (lossy)</string>
     <string name="menu_screenshot_png">PNG (lossless)</string>
-    <string name="menu_set_result">Intent</string>
+    <string name="menu_set_result">SetResult</string>
     <string name="menu_share">Share</string>
     <string name="menu_share_browser">Browser</string>
     <string name="menu_share_map">Map App</string>
